@@ -513,6 +513,15 @@ body {
     </div>
   </div>
 
+  <!-- RISULTATI -->
+  <div class="section" id="sec-risultati">
+    <div class="section-header"><span class="icon">⚽</span> Risultati campionato</div>
+    <div id="giornata-filter" style="margin-bottom:12px;display:flex;gap:6px;flex-wrap:wrap;"></div>
+    <div id="risultati-list">
+      <div class="loading"><div class="spinner"></div>Caricamento risultati...</div>
+    </div>
+  </div>
+
   <!-- STATISTICHE -->
   <div class="section" id="sec-stats">
     <div class="section-header"><span class="icon">📊</span> Statistiche individuali</div>
@@ -535,6 +544,10 @@ body {
   <button class="nav-btn" data-section="partite">
     <span class="nav-icon">📅</span>
     <span>Partite</span>
+  </button>
+  <button class="nav-btn" data-section="risultati">
+    <span class="nav-icon">⚽</span>
+    <span>Risultati</span>
   </button>
   <button class="nav-btn" data-section="classifica">
     <span class="nav-icon">🏆</span>
@@ -724,6 +737,67 @@ function renderClassifica(data) {
   el.innerHTML = html;
 }
 
+let allRisultati = [];
+function renderRisultati(data) {
+  allRisultati = data;
+  const el = document.getElementById('risultati-list');
+  const filterEl = document.getElementById('giornata-filter');
+  if (!data.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">⚽</div>Risultati non ancora inseriti</div>';
+    filterEl.innerHTML = '';
+    return;
+  }
+  // Get unique giornate
+  const giornate = [...new Set(data.map(m => m.Giornata))].sort((a, b) => Number(a) - Number(b));
+  // Filter buttons
+  filterEl.innerHTML = giornate.map(g =>
+    `<button class="filter-btn${g === giornate[0] ? ' active' : ''}" data-g="${g}" style="
+      padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:var(--bg-card);
+      font-family:'Oswald',sans-serif;font-size:0.8rem;font-weight:500;color:var(--fg-dim);cursor:pointer;
+    ">G${g}</button>`
+  ).join('');
+  // Show first giornata
+  showGiornata(giornate[0]);
+  // Button listeners
+  filterEl.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterEl.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('active'); b.style.background = 'var(--bg-card)'; b.style.color = 'var(--fg-dim)'; });
+      btn.classList.add('active');
+      btn.style.background = 'var(--green)';
+      btn.style.color = '#fff';
+      showGiornata(btn.dataset.g);
+    });
+  });
+  // Activate first button visually
+  const firstBtn = filterEl.querySelector('.filter-btn.active');
+  if (firstBtn) { firstBtn.style.background = 'var(--green)'; firstBtn.style.color = '#fff'; }
+}
+
+function showGiornata(g) {
+  const el = document.getElementById('risultati-list');
+  const matches = allRisultati.filter(m => m.Giornata === g);
+  el.innerHTML = matches.map(m => {
+    const homeHL = (m.Casa || '').toUpperCase().includes('OZZI') ? ' highlight' : '';
+    const awayHL = (m.Ospite || '').toUpperCase().includes('OZZI') ? ' highlight' : '';
+    const hasScore = m.GolCasa !== '' && m.GolCasa !== undefined && m.GolOspite !== '' && m.GolOspite !== undefined && (m.Stato || '').toUpperCase() !== 'PROSSIMA';
+    const scoreHTML = hasScore
+      ? `<div class="match-score">${m.GolCasa} - ${m.GolOspite}</div>`
+      : `<div class="match-score tbd">VS</div>`;
+    return `
+      <div class="match-card">
+        <div class="match-teams">
+          <div class="match-team home${homeHL}">${esc(m.Casa || '?')}</div>
+          ${scoreHTML}
+          <div class="match-team away${awayHL}">${esc(m.Ospite || '?')}</div>
+        </div>
+        <div class="match-details">
+          ${m.Data || ''} ${m.Ora ? '• ' + m.Ora : ''} ${m.Luogo ? '• ' + esc(m.Luogo) : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
 function renderStats(data) {
   const el = document.getElementById('stats-list');
   if (!data.length) {
@@ -762,17 +836,19 @@ function esc(s) {
 // LOAD ALL DATA
 // =============================================
 async function loadAll() {
-  const [avvisi, rosa, partite, classifica, stats] = await Promise.all([
+  const [avvisi, rosa, partite, classifica, risultati, stats] = await Promise.all([
     fetchSheet('Avvisi'),
     fetchSheet('Rosa'),
     fetchSheet('Partite'),
     fetchSheet('Classifica'),
+    fetchSheet('Risultati'),
     fetchSheet('Statistiche'),
   ]);
   renderAvvisi(avvisi);
   renderRosa(rosa);
   renderPartite(partite);
   renderClassifica(classifica);
+  renderRisultati(risultati);
   renderStats(stats);
 }
 
