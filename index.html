@@ -699,31 +699,25 @@ function renderClassifica(data) {
     el.innerHTML = '<div class="empty-state"><div class="empty-icon">🏆</div>Classifica non ancora inserita.<br>Vedi il link sotto per quella ufficiale CSI.</div>';
     return;
   }
-  // Sort by Punti descending, then by diff gol
-  data.sort((a, b) => {
-    const pa = Number(a.Punti) || 0;
-    const pb = Number(b.Punti) || 0;
-    if (pb !== pa) return pb - pa;
-    const da = (Number(a.GF) || 0) - (Number(a.GS) || 0);
-    const db = (Number(b.GF) || 0) - (Number(b.GS) || 0);
-    return db - da;
-  });
+  // Sort by Pos ascending (already ranked in sheet)
+  data.sort((a, b) => (Number(a.Pos) || 999) - (Number(b.Pos) || 999));
   let html = `<table class="classifica-table">
     <thead><tr>
-      <th>#</th><th>Squadra</th><th>Pt</th><th>G</th><th>V</th><th>P</th><th>S</th><th>GF</th><th>GS</th>
+      <th>#</th><th>Squadra</th><th>Pt</th><th>PG</th><th>V</th><th>P</th><th>S</th><th>GF</th><th>GS</th><th>Diff</th>
     </tr></thead><tbody>`;
-  data.forEach((t, i) => {
+  data.forEach(t => {
     const isUs = (t.Squadra || '').toUpperCase().includes('OZZI');
     html += `<tr class="${isUs ? 'highlight' : ''}">
-      <td>${i + 1}</td>
+      <td>${t.Pos || ''}</td>
       <td>${esc(t.Squadra || '')}</td>
-      <td><strong>${t.Punti || 0}</strong></td>
-      <td>${t.G || 0}</td>
+      <td><strong>${t.Pti || 0}</strong></td>
+      <td>${t.PG || 0}</td>
       <td>${t.V || 0}</td>
       <td>${t.P || 0}</td>
       <td>${t.S || 0}</td>
       <td>${t.GF || 0}</td>
       <td>${t.GS || 0}</td>
+      <td>${t.Diff || 0}</td>
     </tr>`;
   });
   html += '</tbody></table>';
