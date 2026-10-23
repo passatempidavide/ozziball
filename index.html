@@ -740,7 +740,7 @@ function renderStats(data) {
   data.sort((a, b) => (Number(b.Gol) || 0) - (Number(a.Gol) || 0));
   el.innerHTML = data.map(s => {
     let badges = '';
-    if (Number(s.Presenze)) badges += `<span class="stat-badge stat-pres">🏟 ${s.Presenze}</span>`;
+    if (Number(s.Presenze)) badges += `<span class="stat-badge stat-pres">👕 ${s.Presenze}</span>`;
     if (Number(s.Gol)) badges += `<span class="stat-badge stat-gol">⚽ ${s.Gol}</span>`;
     if (Number(s.Assist)) badges += `<span class="stat-badge stat-assist">🅰️ ${s.Assist}</span>`;
     if (Number(s.MVP)) badges += `<span class="stat-badge stat-mvp">⭐ ${s.MVP}</span>`;
