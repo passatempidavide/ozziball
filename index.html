@@ -748,7 +748,7 @@ function renderRisultati(data) {
     return;
   }
   // Get unique giornate
-  const giornate = [...new Set(data.map(m => m.Giornata))].sort((a, b) => Number(a) - Number(b));
+  const giornate = [...new Set(data.map(m => String(m.Giornata)))].sort((a, b) => Number(a) - Number(b));
   // Filter buttons
   filterEl.innerHTML = giornate.map(g =>
     `<button class="filter-btn${g === giornate[0] ? ' active' : ''}" data-g="${g}" style="
@@ -775,7 +775,7 @@ function renderRisultati(data) {
 
 function showGiornata(g) {
   const el = document.getElementById('risultati-list');
-  const matches = allRisultati.filter(m => m.Giornata === g);
+  const matches = allRisultati.filter(m => String(m.Giornata) === String(g));
   el.innerHTML = matches.map(m => {
     const homeHL = (m.Casa || '').toUpperCase().includes('OZZI') ? ' highlight' : '';
     const awayHL = (m.Ospite || '').toUpperCase().includes('OZZI') ? ' highlight' : '';
