@@ -516,7 +516,12 @@ body {
   <!-- RISULTATI -->
   <div class="section" id="sec-risultati">
     <div class="section-header"><span class="icon">⚽</span> Risultati campionato</div>
-    <div id="giornata-filter" style="margin-bottom:12px;display:flex;gap:6px;flex-wrap:wrap;"></div>
+    <input type="text" id="search-squadra" placeholder="🔍 Cerca squadra..." style="
+      width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);
+      background:var(--bg-card);color:var(--fg);font-family:'Source Sans 3',sans-serif;
+      font-size:0.95rem;margin-bottom:10px;box-sizing:border-box;outline:none;
+    " onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'">
+    <div id="giornata-filter" style="margin-bottom:12px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;"></div>
     <div id="risultati-list">
       <div class="loading"><div class="spinner"></div>Caricamento risultati...</div>
     </div>
@@ -771,11 +776,29 @@ function renderRisultati(data) {
   // Activate first button visually
   const firstBtn = filterEl.querySelector('.filter-btn.active');
   if (firstBtn) { firstBtn.style.background = 'var(--green)'; firstBtn.style.color = '#fff'; }
+  // Search listener
+  const searchInput = document.getElementById('search-squadra');
+  searchInput.value = '';
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim().toLowerCase();
+    if (q.length > 0) {
+      // Deselect giornata buttons
+      filterEl.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('active'); b.style.background = 'var(--bg-card)'; b.style.color = 'var(--fg-dim)'; });
+      showFilteredResults(null, q);
+    } else {
+      // Restore first giornata
+      const first = filterEl.querySelector('.filter-btn');
+      if (first) { first.classList.add('active'); first.style.background = 'var(--green)'; first.style.color = '#fff'; showGiornata(first.dataset.g); }
+    }
+  });
 }
 
-function showGiornata(g) {
+function renderMatchCards(matches) {
   const el = document.getElementById('risultati-list');
-  const matches = allRisultati.filter(m => String(m.Giornata) === String(g));
+  if (!matches.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div>Nessun risultato trovato</div>';
+    return;
+  }
   el.innerHTML = matches.map(m => {
     const homeHL = (m.Casa || '').toUpperCase().includes('OZZI') ? ' highlight' : '';
     const awayHL = (m.Ospite || '').toUpperCase().includes('OZZI') ? ' highlight' : '';
@@ -783,6 +806,7 @@ function showGiornata(g) {
     const scoreHTML = hasScore
       ? `<div class="match-score">${m.GolCasa} - ${m.GolOspite}</div>`
       : `<div class="match-score tbd">VS</div>`;
+    const gLabel = m.Giornata ? `<span style="font-weight:600;color:var(--green);">G${m.Giornata}</span> • ` : '';
     return `
       <div class="match-card">
         <div class="match-teams">
@@ -791,11 +815,27 @@ function showGiornata(g) {
           <div class="match-team away${awayHL}">${esc(m.Ospite || '?')}</div>
         </div>
         <div class="match-details">
-          ${m.Data || ''} ${m.Ora ? '• ' + m.Ora : ''} ${m.Luogo ? '• ' + esc(m.Luogo) : ''}
+          ${gLabel}${m.Data || ''} ${m.Ora ? '• ' + m.Ora : ''} ${m.Luogo ? '• ' + esc(m.Luogo) : ''}
         </div>
       </div>
     `;
   }).join('');
+}
+
+function showGiornata(g) {
+  document.getElementById('search-squadra').value = '';
+  const matches = allRisultati.filter(m => String(m.Giornata) === String(g));
+  renderMatchCards(matches);
+}
+
+function showFilteredResults(giornata, query) {
+  let matches = allRisultati;
+  if (giornata) matches = matches.filter(m => String(m.Giornata) === String(giornata));
+  if (query) matches = matches.filter(m =>
+    (m.Casa || '').toLowerCase().includes(query) ||
+    (m.Ospite || '').toLowerCase().includes(query)
+  );
+  renderMatchCards(matches);
 }
 
 function renderStats(data) {
