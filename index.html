@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>OZZI BALL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FAFAF8;
+  --bg-card: #FFFFFF;
+  --bg-nav: #FFFFFF;
+  --fg: #1A1A1A;
+  --fg-dim: #6B6B6B;
+  --fg-muted: #999999;
+  --green: #1B5E20;
+  --green-light: #E8F5E9;
+  --green-mid: #2E7D32;
+  --orange: #E65100;
+  --orange-light: #FFF3E0;
+  --accent: var(--green);
+  --border: #E5E5E0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06);
+  --radius: 12px;
+  --nav-height: 64px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121212;
+    --bg-card: #1E1E1E;
+    --bg-nav: #1A1A1A;
+    --fg: #E8E8E8;
+    --fg-dim: #A0A0A0;
+    --fg-muted: #707070;
+    --green: #4CAF50;
+    --green-light: #1B3A1D;
+    --green-mid: #66BB6A;
+    --orange: #FF9800;
+    --orange-light: #3A2A10;
+    --border: #333333;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121212;
+  --bg-card: #1E1E1E;
+  --bg-nav: #1A1A1A;
+  --fg: #E8E8E8;
+  --fg-dim: #A0A0A0;
+  --fg-muted: #707070;
+  --green: #4CAF50;
+  --green-light: #1B3A1D;
+  --green-mid: #66BB6A;
+  --orange: #FF9800;
+  --orange-light: #3A2A10;
+  --border: #333333;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  color-scheme: dark;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100dvh;
+  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 16px);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* HEADER */
+.header {
+  background: var(--green);
+  color: #fff;
+  padding: 16px max(16px, env(safe-area-inset-right, 0px)) 16px max(16px, env(safe-area-inset-left, 0px));
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header h1 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.header-sub {
+  font-size: 0.75rem;
+  opacity: 0.85;
+  margin-top: 2px;
+  letter-spacing: 0.5px;
+}
+
+/* MAIN CONTENT */
+.content {
+  padding: 16px max(16px, env(safe-area-inset-right, 0px)) 16px max(16px, env(safe-area-inset-left, 0px));
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* SECTION */
+.section { display: none; }
+.section.active { display: block; }
+
+/* CARDS */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.card-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+/* SECTION HEADER */
+.section-header {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--fg);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-header .icon {
+  font-size: 1.4rem;
+}
+
+/* AVVISI / BACHECA */
+.avviso-date {
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+  margin-bottom: 4px;
+}
+.avviso-text {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* ROSA */
+.player-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+.player-row:last-child { border-bottom: none; }
+.player-num {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--green);
+  width: 36px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.player-info { flex: 1; min-width: 0; }
+.player-name {
+  font-weight: 600;
+  font-size: 1rem;
+}
+.player-role {
+  font-size: 0.8rem;
+  color: var(--fg-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.role-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+.role-P { background: var(--orange-light); color: var(--orange); }
+.role-D { background: #E3F2FD; color: #1565C0; }
+.role-C { background: var(--green-light); color: var(--green); }
+.role-A { background: #FFF3E0; color: #E65100; }
+
+/* PARTITE */
+.match-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.match-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.match-giornata {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.match-status {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.status-giocata { background: var(--green-light); color: var(--green); }
+.status-prossima { background: var(--orange-light); color: var(--orange); }
+.status-rinviata { background: #F5F5F5; color: #999; }
+.match-teams {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 8px 0;
+}
+.match-team {
+  flex: 1;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-align: center;
+}
+.match-team.home { text-align: right; }
+.match-team.away { text-align: left; }
+.match-team.highlight { color: var(--green); font-weight: 700; }
+.match-score {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--fg);
+  min-width: 60px;
+  text-align: center;
+}
+.match-score.tbd { font-size: 1rem; color: var(--fg-muted); }
+.match-details {
+  font-size: 0.8rem;
+  color: var(--fg-dim);
+  text-align: center;
+  margin-top: 6px;
+}
+
+/* CLASSIFICA */
+.classifica-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.classifica-table th {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.5px;
+  color: var(--fg-muted);
+  text-align: center;
+  padding: 8px 4px;
+  border-bottom: 2px solid var(--border);
+}
+.classifica-table th:first-child,
+.classifica-table th:nth-child(2) { text-align: left; }
+.classifica-table td {
+  padding: 10px 4px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+.classifica-table td:first-child { text-align: left; font-weight: 600; width: 24px; }
+.classifica-table td:nth-child(2) { text-align: left; font-weight: 500; }
+.classifica-table tr.highlight td {
+  background: var(--green-light);
+  font-weight: 700;
+}
+.classifica-table tr.highlight td:nth-child(2) { color: var(--green); }
+
+/* STATISTICHE */
+.stat-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 8px;
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-name {
+  flex: 1;
+  font-weight: 600;
+  font-size: 0.95rem;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stat-badges {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.stat-badge {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.stat-pres { background: #E8EAF6; color: #3949AB; }
+.stat-gol { background: var(--green-light); color: var(--green); }
+.stat-assist { background: #E3F2FD; color: #1565C0; }
+.stat-amm { background: #FFF9C4; color: #F9A825; }
+.stat-esp { background: #FFEBEE; color: #C62828; }
+.stat-mvp { background: var(--orange-light); color: var(--orange); }
+
+/* LINKS CSI */
+.csi-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--fg);
+  margin-bottom: 8px;
+  transition: border-color 0.15s;
+}
+.csi-link:hover { border-color: var(--green); }
+.csi-link .link-icon { font-size: 1.2rem; }
+.csi-link .link-text { font-weight: 500; font-size: 0.9rem; }
+.csi-link .link-arrow { margin-left: auto; color: var(--fg-muted); }
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--bg-nav);
+  border-top: 1px solid var(--border);
+  display: flex;
+  z-index: 100;
+}
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  color: var(--fg-muted);
+  font-size: 0.65rem;
+  font-family: 'Source Sans 3', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-btn .nav-icon { font-size: 1.3rem; }
+.nav-btn.active { color: var(--green); }
+
+/* LOADING */
+.loading {
+  text-align: center;
+  padding: 40px 16px;
+  color: var(--fg-muted);
+}
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--fg-muted);
+  font-size: 0.9rem;
+}
+.empty-state .empty-icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+
+/* REFRESH BTN */
+.refresh-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+.refresh-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  color: var(--fg-dim);
+  cursor: pointer;
+  font-family: 'Source Sans 3', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.refresh-btn:active { background: var(--border); }
+
+/* LAST UPDATE */
+.last-update {
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--fg-muted);
+  padding: 8px 0 4px;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>OZZI BALL</h1>
+  <div class="header-sub">CSI Bologna &bull; Calcio a 7 &bull; 2026-2027</div>
+</div>
+
+<div class="content">
+
+  <!-- BACHECA -->
+  <div class="section active" id="sec-bacheca">
+    <div class="section-header"><span class="icon">📋</span> Bacheca</div>
+    <div id="avvisi-list">
+      <div class="loading"><div class="spinner"></div>Caricamento avvisi...</div>
+    </div>
+    <div style="margin-top:20px">
+      <div class="section-header" style="font-size:1rem;margin-bottom:12px"><span class="icon">🔗</span> Link utili</div>
+      <a class="csi-link" href="https://drive.google.com/drive/folders/1dfL0KaQ_gM2majO7I98-oQN7ZOtSDAhG" target="_blank" rel="noopener">
+        <span class="link-icon">📸</span>
+        <span class="link-text">Foto e Video squadra</span>
+        <span class="link-arrow">→</span>
+      </a>
+      <a class="csi-link" href="https://livescore.csibologna.it/team_details.php?team_id=3759" target="_blank" rel="noopener">
+        <span class="link-icon">⚽</span>
+        <span class="link-text">Pagina squadra CSI</span>
+        <span class="link-arrow">→</span>
+      </a>
+      <a class="csi-link" href="https://livescore.csibologna.it/league_details.php?project_id=914" target="_blank" rel="noopener">
+        <span class="link-icon">🏆</span>
+        <span class="link-text">Girone e classifica CSI</span>
+        <span class="link-arrow">→</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ROSA -->
+  <div class="section" id="sec-rosa">
+    <div class="section-header"><span class="icon">👥</span> Rosa giocatori</div>
+    <div class="card" id="rosa-list">
+      <div class="loading"><div class="spinner"></div>Caricamento rosa...</div>
+    </div>
+  </div>
+
+  <!-- PARTITE -->
+  <div class="section" id="sec-partite">
+    <div class="section-header"><span class="icon">📅</span> Calendario e risultati</div>
+    <div id="partite-list">
+      <div class="loading"><div class="spinner"></div>Caricamento partite...</div>
+    </div>
+  </div>
+
+  <!-- CLASSIFICA -->
+  <div class="section" id="sec-classifica">
+    <div class="section-header"><span class="icon">🏆</span> Classifica</div>
+    <div class="card" id="classifica-container">
+      <div class="loading"><div class="spinner"></div>Caricamento classifica...</div>
+    </div>
+    <div style="margin-top:8px">
+      <a class="csi-link" href="https://livescore.csibologna.it/league_details.php?project_id=914" target="_blank" rel="noopener">
+        <span class="link-icon">📊</span>
+        <span class="link-text">Classifica ufficiale CSI</span>
+        <span class="link-arrow">→</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- STATISTICHE -->
+  <div class="section" id="sec-stats">
+    <div class="section-header"><span class="icon">📊</span> Statistiche individuali</div>
+    <div class="card" id="stats-list">
+      <div class="loading"><div class="spinner"></div>Caricamento statistiche...</div>
+    </div>
+  </div>
+
+</div>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-section="bacheca">
+    <span class="nav-icon">📋</span>
+    <span>Bacheca</span>
+  </button>
+  <button class="nav-btn" data-section="rosa">
+    <span class="nav-icon">👥</span>
+    <span>Rosa</span>
+  </button>
+  <button class="nav-btn" data-section="partite">
+    <span class="nav-icon">📅</span>
+    <span>Partite</span>
+  </button>
+  <button class="nav-btn" data-section="classifica">
+    <span class="nav-icon">🏆</span>
+    <span>Classifica</span>
+  </button>
+  <button class="nav-btn" data-section="stats">
+    <span class="nav-icon">📊</span>
+    <span>Stats</span>
+  </button>
+</nav>
+
+<script>
+// =============================================
+// CONFIGURAZIONE — CAMBIA SOLO QUESTO
+// =============================================
+const SHEET_ID = '1MHnNb_w9nqStHz5KEhK9aNnPKn7Dqhteq25nalxWjx8';
+const TEAM_NAME = 'OZZI BALL';
+
+// =============================================
+// Google Sheets fetch helper
+// =============================================
+function sheetURL(sheetName) {
+  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+}
+
+async function fetchSheet(sheetName) {
+  try {
+    const res = await fetch(sheetURL(sheetName));
+    const text = await res.text();
+    // Google wraps JSON in: google.visualization.Query.setResponse({...});
+    const jsonStr = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]+)\);?/);
+    if (!jsonStr) return [];
+    const data = JSON.parse(jsonStr[1]);
+    if (!data.table || !data.table.rows) return [];
+    const cols = data.table.cols.map(c => c.label || '');
+    return data.table.rows.map(row => {
+      const obj = {};
+      row.c.forEach((cell, i) => {
+        obj[cols[i]] = cell ? (cell.v !== null && cell.v !== undefined ? cell.v : (cell.f || '')) : '';
+      });
+      return obj;
+    });
+  } catch (e) {
+    console.error(`Errore caricamento ${sheetName}:`, e);
+    return [];
+  }
+}
+
+// =============================================
+// NAVIGATION
+// =============================================
+const navBtns = document.querySelectorAll('.nav-btn');
+const sections = document.querySelectorAll('.section');
+
+navBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.dataset.section;
+    navBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    sections.forEach(s => s.classList.remove('active'));
+    document.getElementById('sec-' + target).classList.add('active');
+    window.scrollTo(0, 0);
+  });
+});
+
+// =============================================
+// RENDER FUNCTIONS
+// =============================================
+
+function renderAvvisi(data) {
+  const el = document.getElementById('avvisi-list');
+  if (!data.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div>Nessun avviso al momento</div>';
+    return;
+  }
+  // Sort by date descending
+  data.sort((a, b) => (b.Data || '').localeCompare(a.Data || ''));
+  el.innerHTML = data.map(a => `
+    <div class="card">
+      <div class="avviso-date">${a.Data || ''}</div>
+      ${a.Titolo ? `<div class="card-title">${esc(a.Titolo)}</div>` : ''}
+      <div class="avviso-text">${esc(a.Messaggio || '')}</div>
+    </div>
+  `).join('');
+}
+
+function renderRosa(data) {
+  const el = document.getElementById('rosa-list');
+  if (!data.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div>Rosa non ancora inserita</div>';
+    return;
+  }
+  const roleOrder = { 'P': 0, 'D': 1, 'C': 2, 'A': 3 };
+  const roleNames = { 'P': 'Portiere', 'D': 'Difensore', 'C': 'Centrocampista', 'A': 'Attaccante' };
+  data.sort((a, b) => {
+    const ra = roleOrder[a.Ruolo] ?? 9;
+    const rb = roleOrder[b.Ruolo] ?? 9;
+    if (ra !== rb) return ra - rb;
+    return (a.Numero || 99) - (b.Numero || 99);
+  });
+  el.innerHTML = data.map(p => `
+    <div class="player-row">
+      <div class="player-num">${p.Numero || '-'}</div>
+      <div class="player-info">
+        <div class="player-name">${esc(p.Nome || '')} ${esc(p.Cognome || '')}</div>
+      </div>
+      <span class="role-badge role-${p.Ruolo || 'C'}">${roleNames[p.Ruolo] || p.Ruolo || ''}</span>
+    </div>
+  `).join('');
+}
+
+function renderPartite(data) {
+  const el = document.getElementById('partite-list');
+  if (!data.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div>Calendario non ancora inserito</div>';
+    return;
+  }
+  // Sort by giornata number
+  data.sort((a, b) => (Number(a.Giornata) || 0) - (Number(b.Giornata) || 0));
+  el.innerHTML = data.map(m => {
+    const stato = (m.Stato || '').toUpperCase();
+    let statusClass = 'status-prossima';
+    let statusLabel = 'Da giocare';
+    if (stato === 'GIOCATA' || stato === 'FINITA') {
+      statusClass = 'status-giocata';
+      statusLabel = 'Giocata';
+    } else if (stato === 'RINVIATA') {
+      statusClass = 'status-rinviata';
+      statusLabel = 'Rinviata';
+    }
+
+    const homeHL = (m.Casa || '').toUpperCase().includes('OZZI') ? ' highlight' : '';
+    const awayHL = (m.Ospite || '').toUpperCase().includes('OZZI') ? ' highlight' : '';
+
+    const hasScore = m.GolCasa !== '' && m.GolCasa !== undefined && m.GolOspite !== '' && m.GolOspite !== undefined && stato !== 'PROSSIMA' && stato !== 'DA GIOCARE' && stato !== '';
+    const scoreHTML = hasScore
+      ? `<div class="match-score">${m.GolCasa} - ${m.GolOspite}</div>`
+      : `<div class="match-score tbd">VS</div>`;
+
+    return `
+      <div class="match-card">
+        <div class="match-header">
+          <span class="match-giornata">Giornata ${m.Giornata || '?'}</span>
+          <span class="match-status ${statusClass}">${statusLabel}</span>
+        </div>
+        <div class="match-teams">
+          <div class="match-team home${homeHL}">${esc(m.Casa || '?')}</div>
+          ${scoreHTML}
+          <div class="match-team away${awayHL}">${esc(m.Ospite || '?')}</div>
+        </div>
+        <div class="match-details">
+          ${m.Data || ''} ${m.Ora ? '• ' + m.Ora : ''} ${m.Luogo ? '• ' + esc(m.Luogo) : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderClassifica(data) {
+  const el = document.getElementById('classifica-container');
+  if (!data.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">🏆</div>Classifica non ancora inserita.<br>Vedi il link sotto per quella ufficiale CSI.</div>';
+    return;
+  }
+  // Sort by Punti descending, then by diff gol
+  data.sort((a, b) => {
+    const pa = Number(a.Punti) || 0;
+    const pb = Number(b.Punti) || 0;
+    if (pb !== pa) return pb - pa;
+    const da = (Number(a.GF) || 0) - (Number(a.GS) || 0);
+    const db = (Number(b.GF) || 0) - (Number(b.GS) || 0);
+    return db - da;
+  });
+  let html = `<table class="classifica-table">
+    <thead><tr>
+      <th>#</th><th>Squadra</th><th>Pt</th><th>G</th><th>V</th><th>P</th><th>S</th><th>GF</th><th>GS</th>
+    </tr></thead><tbody>`;
+  data.forEach((t, i) => {
+    const isUs = (t.Squadra || '').toUpperCase().includes('OZZI');
+    html += `<tr class="${isUs ? 'highlight' : ''}">
+      <td>${i + 1}</td>
+      <td>${esc(t.Squadra || '')}</td>
+      <td><strong>${t.Punti || 0}</strong></td>
+      <td>${t.G || 0}</td>
+      <td>${t.V || 0}</td>
+      <td>${t.P || 0}</td>
+      <td>${t.S || 0}</td>
+      <td>${t.GF || 0}</td>
+      <td>${t.GS || 0}</td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+function renderStats(data) {
+  const el = document.getElementById('stats-list');
+  if (!data.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div>Statistiche non ancora inserite</div>';
+    return;
+  }
+  // Sort by gol descending
+  data.sort((a, b) => (Number(b.Gol) || 0) - (Number(a.Gol) || 0));
+  el.innerHTML = data.map(s => {
+    let badges = '';
+    if (Number(s.Presenze)) badges += `<span class="stat-badge stat-pres">🏟 ${s.Presenze}</span>`;
+    if (Number(s.Gol)) badges += `<span class="stat-badge stat-gol">⚽ ${s.Gol}</span>`;
+    if (Number(s.Assist)) badges += `<span class="stat-badge stat-assist">🅰️ ${s.Assist}</span>`;
+    if (Number(s.MVP)) badges += `<span class="stat-badge stat-mvp">⭐ ${s.MVP}</span>`;
+    if (Number(s.Ammonizioni)) badges += `<span class="stat-badge stat-amm">🟨 ${s.Ammonizioni}</span>`;
+    if (Number(s.Espulsioni)) badges += `<span class="stat-badge stat-esp">🟥 ${s.Espulsioni}</span>`;
+    return `
+      <div class="stat-row">
+        <div class="stat-name">${esc(s.Giocatore || '')}</div>
+        <div class="stat-badges">${badges || '<span style="color:var(--fg-muted);font-size:0.8rem">—</span>'}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// =============================================
+// UTILITIES
+// =============================================
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = String(s);
+  return d.innerHTML;
+}
+
+// =============================================
+// LOAD ALL DATA
+// =============================================
+async function loadAll() {
+  const [avvisi, rosa, partite, classifica, stats] = await Promise.all([
+    fetchSheet('Avvisi'),
+    fetchSheet('Rosa'),
+    fetchSheet('Partite'),
+    fetchSheet('Classifica'),
+    fetchSheet('Statistiche'),
+  ]);
+  renderAvvisi(avvisi);
+  renderRosa(rosa);
+  renderPartite(partite);
+  renderClassifica(classifica);
+  renderStats(stats);
+}
+
+loadAll();
+</script>
+
+</body>
+</html>
