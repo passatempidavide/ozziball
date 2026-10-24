@@ -322,6 +322,36 @@ body {
   font-weight: 700;
 }
 .classifica-table tr.highlight td:nth-child(2) { color: var(--green); }
+/* Zone qualificazione */
+.zone-badge {
+  display: inline-block;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  color: #fff;
+}
+.zone-steel { background: #5C6BC0; }
+.zone-rock { background: #EF6C00; }
+.zone-glass { background: #26A69A; }
+.zone-cristal { background: #8D6E63; }
+.zone-separator td { border-bottom: 3px solid var(--fg-muted) !important; }
+.zone-header-row td {
+  padding: 6px 4px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--border);
+}
+.zone-header-row.zone-steel-header td { color: #5C6BC0; }
+.zone-header-row.zone-rock-header td { color: #EF6C00; }
+.zone-header-row.zone-glass-header td { color: #26A69A; }
+.zone-header-row.zone-cristal-header td { color: #8D6E63; }
 
 /* STATISTICHE */
 .stat-row {
@@ -757,9 +787,26 @@ function renderClassifica(data) {
     <thead><tr>
       <th>#</th><th>Squadra</th><th>Pt</th><th>PG</th><th>V</th><th>P</th><th>S</th><th>GF</th><th>GS</th><th>Diff</th>
     </tr></thead><tbody>`;
+  function getZone(pos) {
+    const p = Number(pos);
+    if (p <= 26) return { name: 'STEEL', cls: 'steel' };
+    if (p <= 52) return { name: 'ROCK', cls: 'rock' };
+    if (p <= 78) return { name: 'GLASS', cls: 'glass' };
+    return { name: 'CRISTAL', cls: 'cristal' };
+  }
+  let lastZone = '';
   data.forEach(t => {
+    const pos = Number(t.Pos) || 999;
+    const zone = getZone(pos);
+    if (zone.cls !== lastZone) {
+      html += `<tr class="zone-header-row zone-${zone.cls}-header">
+        <td colspan="10"><span class="zone-badge zone-${zone.cls}">${zone.name}</span> Posizioni ${zone.cls === 'steel' ? '1–26' : zone.cls === 'rock' ? '27–52' : zone.cls === 'glass' ? '53–78' : '79–98'}</td>
+      </tr>`;
+      lastZone = zone.cls;
+    }
     const isUs = (t.Squadra || '').toUpperCase().includes('OZZI');
-    html += `<tr class="${isUs ? 'highlight' : ''}">
+    const isLast = (pos === 26 || pos === 52 || pos === 78);
+    html += `<tr class="${isUs ? 'highlight' : ''} ${isLast ? 'zone-separator' : ''}">
       <td>${t.Pos || ''}</td>
       <td>${esc(t.Squadra || '')}</td>
       <td><strong>${t.Pti || 0}</strong></td>
