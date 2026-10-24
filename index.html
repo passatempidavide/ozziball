@@ -655,7 +655,8 @@ async function fetchSheet(sheetName) {
     return data.table.rows.map(row => {
       const obj = {};
       row.c.forEach((cell, i) => {
-        obj[cols[i]] = cell ? (cell.v !== null && cell.v !== undefined ? cell.v : (cell.f || '')) : '';
+        // Prefer formatted value (cell.f) for dates, fall back to raw value (cell.v)
+        obj[cols[i]] = cell ? (cell.f || (cell.v !== null && cell.v !== undefined ? cell.v : '')) : '';
       });
       return obj;
     });
