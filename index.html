@@ -599,6 +599,14 @@ body {
     </div>
   </div>
 
+  <!-- TOP MARCATORI -->
+  <div class="section" id="sec-marcatori">
+    <div class="section-header"><span class="icon">🥇</span> Top Marcatori</div>
+    <div id="marcatori-list">
+      <div class="loading"><div class="spinner"></div>Caricamento marcatori...</div>
+    </div>
+  </div>
+
 </div>
 
 <nav class="bottom-nav">
@@ -625,6 +633,10 @@ body {
   <button class="nav-btn" data-section="stats">
     <span class="nav-icon">📊</span>
     <span>Stats</span>
+  </button>
+  <button class="nav-btn" data-section="marcatori">
+    <span class="nav-icon">🥇</span>
+    <span>Gol</span>
   </button>
 </nav>
 
@@ -945,6 +957,47 @@ function renderStats(data) {
   }).join('');
 }
 
+function renderMarcatori(data) {
+  const el = document.getElementById('marcatori-list');
+  if (!data.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">🥇</div>Classifica marcatori non ancora disponibile</div>';
+    return;
+  }
+  // Sort by gol descending, then alphabetically
+  data.sort((a, b) => (Number(b.Gol) || 0) - (Number(a.Gol) || 0) || (a.Giocatore || '').localeCompare(b.Giocatore || ''));
+
+  let html = '<div class="card" style="overflow-x:auto;">';
+  html += '<table style="width:100%;border-collapse:collapse;font-size:0.9rem;">';
+  html += '<thead><tr style="border-bottom:2px solid var(--border);text-align:left;">';
+  html += '<th style="padding:8px 6px;font-family:Oswald,sans-serif;font-weight:600;width:36px;">#</th>';
+  html += '<th style="padding:8px 6px;font-family:Oswald,sans-serif;font-weight:600;">Giocatore</th>';
+  html += '<th style="padding:8px 6px;font-family:Oswald,sans-serif;font-weight:600;">Squadra</th>';
+  html += '<th style="padding:8px 6px;font-family:Oswald,sans-serif;font-weight:600;text-align:center;width:48px;">⚽</th>';
+  html += '</tr></thead><tbody>';
+
+  data.forEach((m, i) => {
+    const pos = m.Pos || String(i + 1);
+    const isOzzi = (m.Squadra || '').toUpperCase().includes('OZZI BALL');
+    const rowStyle = isOzzi ? `background:var(--green-light);font-weight:600;` : '';
+    const teamStyle = isOzzi ? `color:var(--green-mid);font-weight:700;` : `color:var(--fg-dim);`;
+    // Medal for top 3
+    let medal = '';
+    if (pos === '1') medal = '🥇 ';
+    else if (pos === '2') medal = '🥈 ';
+    else if (pos === '3') medal = '🥉 ';
+
+    html += `<tr style="border-bottom:1px solid var(--border);${rowStyle}">`;
+    html += `<td style="padding:8px 6px;font-weight:600;color:var(--fg-dim);">${medal || pos}</td>`;
+    html += `<td style="padding:8px 6px;">${esc(m.Giocatore || '')}</td>`;
+    html += `<td style="padding:8px 6px;font-size:0.8rem;${teamStyle}">${esc(m.Squadra || '')}</td>`;
+    html += `<td style="padding:8px 6px;text-align:center;font-weight:700;font-family:Oswald,sans-serif;font-size:1.1rem;">${m.Gol || '0'}</td>`;
+    html += '</tr>';
+  });
+
+  html += '</tbody></table></div>';
+  el.innerHTML = html;
+}
+
 // =============================================
 // UTILITIES
 // =============================================
@@ -958,13 +1011,14 @@ function esc(s) {
 // LOAD ALL DATA
 // =============================================
 async function loadAll() {
-  const [avvisi, rosa, partite, classifica, risultati, stats] = await Promise.all([
+  const [avvisi, rosa, partite, classifica, risultati, stats, marcatori] = await Promise.all([
     fetchSheet('Avvisi'),
     fetchSheet('Rosa'),
     fetchSheet('Partite'),
     fetchSheet('Classifica'),
     fetchSheet('Risultati'),
     fetchSheet('Statistiche'),
+    fetchSheet('Marcatori'),
   ]);
   renderAvvisi(avvisi);
   renderRosa(rosa);
@@ -972,6 +1026,7 @@ async function loadAll() {
   renderClassifica(classifica);
   renderRisultati(risultati);
   renderStats(stats);
+  renderMarcatori(marcatori);
 }
 
 loadAll();
