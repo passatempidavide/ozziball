@@ -980,14 +980,8 @@ function renderMarcatori(data) {
     const isOzzi = (m.Squadra || '').toUpperCase().includes('OZZI BALL');
     const rowStyle = isOzzi ? `background:var(--green-light);font-weight:600;` : '';
     const teamStyle = isOzzi ? `color:var(--green-mid);font-weight:700;` : `color:var(--fg-dim);`;
-    // Medal for top 3
-    let medal = '';
-    if (pos === '1') medal = '🥇 ';
-    else if (pos === '2') medal = '🥈 ';
-    else if (pos === '3') medal = '🥉 ';
-
     html += `<tr style="border-bottom:1px solid var(--border);${rowStyle}">`;
-    html += `<td style="padding:8px 6px;font-weight:600;color:var(--fg-dim);">${medal || pos}</td>`;
+    html += `<td style="padding:8px 6px;font-weight:600;color:var(--fg-dim);">${pos}</td>`;
     html += `<td style="padding:8px 6px;">${esc(m.Giocatore || '')}</td>`;
     html += `<td style="padding:8px 6px;font-size:0.8rem;${teamStyle}">${esc(m.Squadra || '')}</td>`;
     html += `<td style="padding:8px 6px;text-align:center;font-weight:700;font-family:Oswald,sans-serif;font-size:1.1rem;">${m.Gol || '0'}</td>`;
